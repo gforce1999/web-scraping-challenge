@@ -25,8 +25,8 @@ def scrape():
     html = browser.html
     soup = BeautifulSoup(html, 'html.parser')
     # get title and news article
-    news_title = soup.find('div',class_="content_title").get_text
-    news_p = soup.find('div',class_='article_teaser_body').get_text 
+    news_title = soup.find('div',class_="content_title").get_text()
+    news_p = soup.find('div',class_='article_teaser_body').get_text() 
     # store latest news title and paragraph text in mars_dict
     mars_dict['news_title'] = news_title
     mars_dict['news_p'] = news_p 
@@ -63,10 +63,9 @@ def scrape():
     mars_earth_df.rename(columns=mars_earth_df.iloc[0])
     # set_index to 'mars-earth comparison column'
     mars_earth_df.set_index('Mars - Earth Comparison', inplace=True)
-    # convert dataframe to dictionary
-    mars_earth_dict = mars_earth_df.to_dict()
-    # store dictionary to mars dict
-    mars_dict['table_data'] = mars_earth_dict
+    mars_facts = mars_earth_df.to_html(justify='left')
+    # store to mars dict
+    mars_dict['table_data'] = mars_facts
 
     ##### Mars Hemispheres
     # URL of page to be scraped
@@ -82,14 +81,17 @@ def scrape():
     # list of links for hemisphere pages
     hemispheres_list=[]  
     # Iterate through each book
+
     for hemisphere in hemispheres:
         # Use Beautiful Soup's find() method to navigate and retrieve attributes
         link = hemisphere.find('a')
         href = link['href']
         hemispheres_list.append('https://marshemispheres.com/' + href)
+
     # list of dictioinaries of hemisphere image urls 
     hemisphere_image_urls=[]
     # get image url and titles
+
     for hemisphere in hemispheres_list:
         # URL of page to be scraped
         browser.visit(hemisphere)
@@ -100,9 +102,10 @@ def scrape():
         # Retrieve all elements that contain image link information
         results = soup.find_all('div', class_='cover')      
         for result in results:
-            title = result.find('h2',class_='title').text
+            title = result.find('h2',class_='title').get_text()
         # get the image url and title
-        images = soup.find_all('div', class_ ='downloads')        
+        images = soup.find_all('div', class_ ='downloads')
+
         for image in images:
             ul = image.find('ul')
             li = ul.find('li')
@@ -114,10 +117,12 @@ def scrape():
                 'img_url': img_url,
                 }
             hemisphere_image_urls.append(post)
+            print("hemisphere_image_urls")
+            print(hemisphere_image_urls)
         # store hemisphere image links into mars_dict
-        mars_dict['hemisphere_image_urls'] = hemisphere_image_urls
+    mars_dict['hemisphere_image_urls'] = hemisphere_image_urls
 
-        return mars_dict
+    return mars_dict
 
         
 
